@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMend - Mental Health Chatbot</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --primary-light: #9d4edd;
+            --secondary: #7b2cbf;
+            --accent: #ff9e00;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light: #e0e0e0;
+            --lighter: #f5f5f5;
+            --gray: #424242;
+            --light-gray: #616161;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #ef233c;
+            --border-radius: 16px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --glow: 0 0 15px rgba(138, 43, 226, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 158, 0, 0.6);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            background: rgba(30, 30, 46, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent);
+            transition: transform 0.5s ease;
+        }
+
+        .logo:hover i {
+            transform: rotate(360deg);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 2rem 4rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 0.8s forwards;
+        }
+
+        .hero-subtitle {
+            color: var(--light-gray);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            animation: fadeInUp 0.8s forwards 0.3s;
+            opacity: 0;
+        }
+
+        /* Chatbot Container */
+        .chatbot-container {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin: 2rem auto;
+            max-width: 800px;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 0.8s forwards 0.6s;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .chat-header i {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .chat-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        /* Message Styles */
+        .message {
+            max-width: 80%;
+            padding: 1rem 1.2rem;
+            border-radius: var(--border-radius);
+            animation: fadeIn 0.3s ease-out;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .bot-message {
+            background: rgba(66, 66, 66, 0.5);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-message {
+            background: rgba(138, 43, 226, 0.2);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            color: var(--light);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.2rem;
+            background: rgba(66, 66, 66, 0.5);
+            border-radius: var(--border-radius);
+            align-self: flex-start;
+            width: fit-content;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--light-gray);
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Quick Reply Buttons */
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .quick-reply-btn {
+            background: rgba(138, 43, 226, 0.2);
+            color: var(--light);
+            border: 1px solid var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .quick-reply-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Chat Input */
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid rgba(138, 43, 226, 0.2);
+            background: rgba(40, 40, 40, 0.8);
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            background: rgba(30, 30, 30, 0.8);
+            color: var(--light);
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        .send-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* Resources Section */
+        .resources-section {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(20, 20, 20, 0.95));
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            margin-top: 3rem;
+            text-align: center;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 0.8s forwards 0.9s;
+        }
+
+        .resources-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .resource-card {
+            background: rgba(66, 66, 66, 0.3);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(138, 43, 226, 0.2);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(138, 43, 226, 0.2);
+        }
+
+        .resource-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .resource-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            color: var(--light);
+        }
+
+        .resource-desc {
+            color: var(--light-gray);
+            font-size: 0.9rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .resource-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .resource-link:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            text-align: center;
+            color: var(--light-gray);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+            padding: 1rem;
+            border-top: 1px solid rgba(138, 43, 226, 0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: row;
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: rgba(30, 30, 46, 0.95);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 1rem 0;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            }
+
+            .nav-links li {
+                margin: 0;
+                text-align: center;
+                padding: 0.5rem 0;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 0.5rem 0;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .nav-active {
+                display: flex;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .chatbot-container {
+                height: 500px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <i class="fas fa-brain"></i>
+            <span>MindMend</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">login</a></li>
+            <li><a href="service.html">Service</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="hamburger">&#9776;</div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" style="margin-top: 1cm;">
+        <h1 class="hero-title">Mental Health Support Chatbot</h1>
+        <p class="hero-subtitle">Get immediate support and resources for your mental health concerns</p>
+    </section>
+
+    <!-- Chatbot Container -->
+    <div class="container">
+        <div class="chatbot-container">
+            <div class="chat-header">
+                <i class="fas fa-robot"></i>
+                <h2>MindMend Assistant</h2>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be added here dynamically -->
+                <div class="message bot-message">
+                    Hello! I'm here to help with your mental health concerns. How are you feeling today?
+                    <div class="quick-replies">
+                        <button class="quick-reply-btn" onclick="sendQuickReply('I\'m feeling anxious')">I'm feeling anxious</button>
+                        <button class="quick-reply-btn" onclick="sendQuickReply('I\'m feeling depressed')">I'm feeling depressed</button>
+                        <button class="quick-reply-btn" onclick="sendQuickReply('I need stress relief')">I need stress relief</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="user-input" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Resources Section -->
+        <section class="resources-section">
+            <h2 class="resources-title">Mental Health Resources</h2>
+            <p>Here are some additional resources that might help you:</p>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="resource-title">Self-Help Guides</h3>
+                    <p class="resource-desc">Access our library of self-help materials for various mental health concerns.</p>
+                    <a href="#" class="resource-link">Explore Guides</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="resource-title">Crisis Hotlines</h3>
+                    <p class="resource-desc">Immediate help is available if you're in crisis or need someone to talk to.</p>
+                    <a href="#" class="resource-link">View Hotlines</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3 class="resource-title">Find a Therapist</h3>
+                    <p class="resource-desc">Connect with licensed mental health professionals in your area.</p>
+                    <a href="#" class="resource-link">Search Now</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="disclaimer">
+            <p><strong>Note:</strong> This chatbot provides general mental health information and is not a substitute for professional medical advice, diagnosis, or treatment. If you're in crisis, please contact a mental health professional or emergency services immediately.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Create floating particles
+            function createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                const particleCount = window.innerWidth < 768 ? 30 : 50;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // Random position
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100 + 100; // Start below viewport
+                    
+                    // Random size
+                    const size = Math.random() * 3 + 1;
+                    
+                    // Random animation duration
+                    const duration = Math.random() * 15 + 10;
+                    
+                    // Random delay
+                    const delay = Math.random() * 10;
+                    
+                    particle.style.left = `${posX}%`;
+                    particle.style.top = `${posY}%`;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.animationDuration = `${duration}s`;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.opacity = Math.random() * 0.5 + 0.1;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+
+            // Navbar scroll effect
+            window.addEventListener("scroll", function () {
+                const navbar = document.querySelector(".navbar");
+                if (window.scrollY > 50) {
+                    navbar.classList.add("scrolled");
+                } else {
+                    navbar.classList.remove("scrolled");
+                }
+            });
+
+            // Hamburger menu toggle
+            document.querySelector(".hamburger").addEventListener("click", function() {
+                document.querySelector(".nav-links").classList.toggle("nav-active");
+            });
+
+            // Initialize particles
+            createParticles();
+        });
+
+        // Chatbot functionality
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Handle Enter key press
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Send message function
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                addUserMessage(message);
+                userInput.value = '';
+                showTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    generateBotResponse(message);
+                }, 1500);
+            }
+        }
+
+        // Quick reply function
+        function sendQuickReply(message) {
+            addUserMessage(message);
+            showTypingIndicator();
+            setTimeout(() => {
+                removeTypingIndicator();
+                generateBotResponse(message);
+            }, 1500);
+        }
+
+        // Add user message to chat
+        function addUserMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'user-message');
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        // Add bot message to chat
+        function addBotMessage(message, quickReplies = []) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'bot-message');
+            messageElement.innerHTML = message;
+            
+            if (quickReplies.length > 0) {
+                const quickRepliesContainer = document.createElement('div');
+                quickRepliesContainer.classList.add('quick-replies');
+                
+                quickReplies.forEach(reply => {
+                    const button = document.createElement('button');
+                    button.classList.add('quick-reply-btn');
+                    button.textContent = reply;
+                    button.onclick = function() {
+                        sendQuickReply(reply);
+                    };
+                    quickRepliesContainer.appendChild(button);
+                });
+                
+                messageElement.appendChild(quickRepliesContainer);
+            }
+            
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        // Show typing indicator
+        function showTypingIndicator() {
+            const typingElement = document.createElement('div');
+            typingElement.classList.add('typing-indicator');
+            typingElement.id = 'typing-indicator';
+            typingElement.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatMessages.appendChild(typingElement);
+            scrollToBottom();
+        }
+
+        // Remove typing indicator
+        function removeTypingIndicator() {
+            const typingElement = document.getElementById('typing-indicator');
+            if (typingElement) {
+                typingElement.remove();
+            }
+        }
+
+        // Scroll to bottom of chat
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Generate bot response based on user input
+        function generateBotResponse(userMessage) {
+            let response = "";
+            let quickReplies = [];
+            const lowerMessage = userMessage.toLowerCase();
+
+            if (lowerMessage.includes('anxious') || lowerMessage.includes('anxiety')) {
+                response = `I understand you're feeling anxious. Here are some suggestions that might help:
+                <ul style="margin-top: 0.5rem; margin-left: 1.2rem;">
+                    <li>Practice deep breathing exercises (inhale for 4 seconds, hold for 4, exhale for 6)</li>
+                    <li>Try grounding techniques like the 5-4-3-2-1 method</li>
+                    <li>Limit caffeine and get regular exercise</li>
+                </ul>
+                Would you like me to suggest some meditation exercises or breathing techniques?`;
+                quickReplies = ["Yes, show me meditation exercises", "Breathing techniques please", "I need more help"];
+            } 
+            else if (lowerMessage.includes('depress') || lowerMessage.includes('sad')) {
+                response = `I hear that you're feeling depressed. Please know that you're not alone. Some things that might help:
+                <ul style="margin-top: 0.5rem; margin-left: 1.2rem;">
+                    <li>Try to maintain a regular routine, even when you don't feel like it</li>
+                    <li>Reach out to someone you trust about how you're feeling</li>
+                    <li>Small activities like a short walk can sometimes help shift your mood</li>
+                </ul>
+                Would you like resources for professional help or self-care suggestions?`;
+                quickReplies = ["Professional help resources", "Self-care suggestions", "I need immediate help"];
+            }
+            else if (lowerMessage.includes('stress') || lowerMessage.includes('overwhelm')) {
+                response = `Stress can feel overwhelming. Here are some strategies that might help:
+                <ul style="margin-top: 0.5rem; margin-left: 1.2rem;">
+                    <li>Prioritize tasks and break them into smaller steps</li>
+                    <li>Practice mindfulness or short meditation breaks</li>
+                    <li>Make time for activities you enjoy, even if brief</li>
+                </ul>
+                Would you like stress management techniques or help prioritizing tasks?`;
+                quickReplies = ["Stress management techniques", "Help prioritizing", "Both please"];
+            }
+            else if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                response = "Hello there! How can I help you today?";
+                quickReplies = ["I'm feeling anxious", "I'm feeling depressed", "I need stress relief"];
+            }
+            else {
+                response = "I want to help you with your mental health concerns. Could you tell me more about how you're feeling?";
+                quickReplies = ["I'm feeling anxious", "I'm feeling depressed", "I'm stressed", "I need general help"];
+            }
+
+            addBotMessage(response, quickReplies);
+        }
+    </script>
+</body>
+</html>

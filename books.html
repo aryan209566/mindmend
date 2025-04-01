@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Help Books - MindMend</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --primary-light: #9d4edd;
+            --secondary: #7b2cbf;
+            --accent: #ff9e00;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light: #e0e0e0;
+            --lighter: #f5f5f5;
+            --gray: #424242;
+            --light-gray: #616161;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #ef233c;
+            --border-radius: 16px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --glow: 0 0 15px rgba(138, 43, 226, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 158, 0, 0.6);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            background: rgba(30, 30, 46, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent);
+            transition: transform 0.5s ease;
+        }
+
+        .logo:hover i {
+            transform: rotate(360deg);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* Books Section */
+        .books-section {
+            margin-top: 80px;
+            padding: 5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .books-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            background: linear-gradient(to right, var(--light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 0.8s forwards 0.3s;
+        }
+
+        .section-subtitle {
+            color: var(--light-gray);
+            font-size: 1.2rem;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 0.8s forwards 0.6s;
+        }
+
+        .books-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .book-card {
+            background: rgba(40, 40, 40, 0.8);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 350px;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(138, 43, 226, 0.2);
+            transform: translateY(50px);
+            opacity: 0;
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-card.visible {
+            animation: fadeInUp 0.8s forwards;
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px) scale(1.03) !important;
+            box-shadow: 0 15px 35px rgba(138, 43, 226, 0.3);
+        }
+
+        .book-cover {
+            width: 150px;
+            height: 200px;
+            margin: 0 auto 1.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .book-card:hover .book-cover {
+            transform: rotate(5deg) scale(1.05);
+        }
+
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .book-card:hover .book-cover img {
+            transform: scale(1.1);
+        }
+
+        .book-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+            transition: var(--transition);
+        }
+
+        .book-card:hover h3 {
+            color: var(--accent);
+        }
+
+        .book-author {
+            color: var(--light-gray);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .book-card:hover .book-author {
+            color: var(--lighter);
+        }
+
+        .book-desc {
+            color: var(--light-gray);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .book-card:hover .book-desc {
+            color: var(--lighter);
+        }
+
+        .read-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .read-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .read-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.6);
+        }
+
+        .read-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Book Categories */
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 0.8s forwards 0.9s;
+        }
+
+        .category-btn {
+            background: rgba(40, 40, 40, 0.8);
+            color: var(--light);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Featured Badge */
+        .featured-badge {
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background: var(--accent);
+            color: var(--dark);
+            padding: 0.3rem 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .book-card {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: row;
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: rgba(30, 30, 46, 0.95);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 1rem 0;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            }
+
+            .nav-links li {
+                margin: 0;
+                text-align: center;
+                padding: 0.5rem 0;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 0.5rem 0;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .nav-active {
+                display: flex;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .books-section {
+                padding: 5rem 1rem;
+            }
+
+            .book-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <i class="fas fa-brain"></i>
+            <span>MindMend</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/service.html">Services</a></li>
+            <li><a href="/books.html" class="active">Books</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+        </ul>
+        <div class="hamburger">&#9776;</div>
+    </nav>
+
+    <!-- Books Section -->
+    <section class="books-section">
+        <h2 class="section-title">Self-Help Books Collection</h2>
+        <p class="section-subtitle">Discover transformative books to guide your mental wellness journey</p>
+<!--         
+        <div class="categories">
+            <button class="category-btn active">All</button>
+            <button class="category-btn">Anxiety</button>
+            <button class="category-btn">Mindfulness</button>
+            <button class="category-btn">Habits</button>
+            <button class="category-btn">Relationships</button>
+        </div> -->
+
+        <div class="books-container">
+            <div class="book-card">
+                <div class="featured-badge">Featured</div>
+                <div class="book-cover">
+                    <img src="/Book1.jpg" alt="The Power of Now">
+                </div>
+                <h3>The Power of Now</h3>
+                <p class="book-author">By Eckhart Tolle</p>
+                <p class="book-desc">A guide to spiritual enlightenment that helps readers live in the present moment.</p>
+                <a href="/Book1.jpg" target="_blank" class="read-btn">
+                    <i class="fas fa-book-open"></i> Read Now
+                </a>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover">
+                    <img src="/Book2.jpg" alt="The Four Agreements">
+                </div>
+                <h3>The Four Agreements</h3>
+                <p class="book-author">By Don Miguel Ruiz</p>
+                <p class="book-desc">A practical guide to personal freedom based on ancient Toltec wisdom.</p>
+                <a href="/Book2.jpg" target="_blank" class="read-btn">
+                    <i class="fas fa-book-open"></i> Read Now
+                </a>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover">
+                    <img src="/Book3.jpg" alt="Atomic Habits">
+                </div>
+                <h3>Atomic Habits</h3>
+                <p class="book-author">By James Clear</p>
+                <p class="book-desc">Learn how tiny changes in behavior can result in remarkable life transformations.</p>
+                <a href="/Book3.jpg" target="_blank" class="read-btn">
+                    <i class="fas fa-book-open"></i> Read Now
+                </a>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover">
+                    <img src="/Book4.jpg" alt="The Subtle Art of Not Giving a F*ck">
+                </div>
+                <h3>The Subtle Art of Not Giving a F*ck</h3>
+                <p class="book-author">By Mark Manson</p>
+                <p class="book-desc">A counterintuitive approach to living a good life with unconventional wisdom.</p>
+                <a href="/Book4.jpg" target="_blank" class="read-btn">
+                    <i class="fas fa-book-open"></i> Read Now
+                </a>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover">
+                    <img src="/Book5.jpg" alt="Daring Greatly">
+                </div>
+                <h3>Daring Greatly</h3>
+                <p class="book-author">By Brené Brown</p>
+                <p class="book-desc">How the courage to be vulnerable transforms the way we live, love, parent, and lead.</p>
+                <a href="/Book5.jpg" target="_blank" class="read-btn">
+                    <i class="fas fa-book-open"></i> Read Now
+                </a>
+            </div>
+
+            <div class="book-card">
+                <div class="featured-badge">Featured</div>
+                <div class="book-cover">
+                    <img src="/Book6.jpg" alt="The Happiness Hypothesis">
+                </div>
+                <h3>The Happiness Hypothesis</h3>
+                <p class="book-author">By Jonathan Haidt</p>
+                <p class="book-desc">Finding modern truth in ancient wisdom about happiness and meaning.</p>
+                <a href="/Book6.jpg" target="_blank" class="read-btn">
+                    <i class="fas fa-book-open"></i> Read Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Create floating particles
+            function createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                const particleCount = window.innerWidth < 768 ? 30 : 50;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // Random position
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100 + 100; // Start below viewport
+                    
+                    // Random size
+                    const size = Math.random() * 3 + 1;
+                    
+                    // Random animation duration
+                    const duration = Math.random() * 15 + 10;
+                    
+                    // Random delay
+                    const delay = Math.random() * 10;
+                    
+                    particle.style.left = `${posX}%`;
+                    particle.style.top = `${posY}%`;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.animationDuration = `${duration}s`;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.opacity = Math.random() * 0.5 + 0.1;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+
+            // Navbar background change on scroll
+            window.addEventListener("scroll", function () {
+                const navbar = document.querySelector(".navbar");
+                if (window.scrollY > 50) {
+                    navbar.classList.add("scrolled");
+                } else {
+                    navbar.classList.remove("scrolled");
+                }
+            });
+
+            // Hamburger menu toggle
+            document.querySelector(".hamburger").addEventListener("click", function() {
+                document.querySelector(".nav-links").classList.toggle("nav-active");
+            });
+
+            // Category filter buttons
+            const categoryBtns = document.querySelectorAll(".category-btn");
+            categoryBtns.forEach(btn => {
+                btn.addEventListener("click", function() {
+                    categoryBtns.forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+                    // Here you would filter the books by category
+                });
+            });
+
+            // Intersection Observer for animations
+            const animateOnScroll = (elements, className) => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add(className);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                elements.forEach(element => observer.observe(element));
+            };
+
+            // Animate book cards
+            const bookCards = document.querySelectorAll(".book-card");
+            animateOnScroll(bookCards, "visible");
+
+            // Initialize particles
+            createParticles();
+        });
+    </script>
+</body>
+</html>
